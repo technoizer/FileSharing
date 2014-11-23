@@ -99,8 +99,10 @@ public class threadClient implements Runnable{
         }
         ListClient baru = new ListClient();
         baru.setNames(names);
+        oos.reset();
         oos.writeObject(baru);
         oos.flush();
+        oos.reset();
     }
     /**
      * @return the sockcli
