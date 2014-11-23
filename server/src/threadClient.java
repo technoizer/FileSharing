@@ -31,11 +31,11 @@ public class threadClient implements Runnable{
     private DataInputStream dis = null;
     private DataOutputStream dos = null;
     private BufferedReader br = null;
-    private BufferedWriter bw = null;
     private ObjectOutputStream oos = null;
     private ObjectInputStream ois = null;
     private final SocketAddress sa;
     private String username;
+    private final ArrayList<String> Recipient = new ArrayList<>();
     public threadClient (Socket sockcli, ArrayList<threadClient> t){
         this.sockcli = sockcli;
         this.alThread = t;
@@ -60,13 +60,25 @@ public class threadClient implements Runnable{
             this.setUsername(msg);
             
             while ((msg = ois.readUTF()) != null ){
-                if (msg.equals("LIST") == true){
+                System.out.print(msg + "\n");
+                if (msg.equals("LIST")){
                     this.sendList();
                 }
                 else if (msg.equals("QUIT")){
                     break;
                 }
-                System.out.print(msg + "\n");
+                else if (msg.equals("RCPT")){
+                    oos.writeUTF("OK");
+                    oos.flush();
+                    
+                    ListClient Baru = new ListClient();
+                    Baru = (ListClient) ois.readObject();
+                    ArrayList<String> names = Baru.getNames();
+                    for (int i=0;i<names.size();i++){
+                        System.out.print("S" + i + " ");
+                    }
+                    System.out.print("\n");
+                }
             }
             oos.close();
             getSockcli().close();
@@ -74,6 +86,8 @@ public class threadClient implements Runnable{
                 this.alThread.remove(this);
             }
         } catch (IOException ex) {
+            Logger.getLogger(threadClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(threadClient.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
@@ -94,7 +108,7 @@ public class threadClient implements Runnable{
         threadClient tc = null;
         for(int i=0; i<this.alThread.size(); i++){
             tc  = this.alThread.get(i);
-            if(tc.getUsername()!=this.getUsername())
+            //if(tc.getUsername()!=this.getUsername())
                 names.add(tc.getUsername());
         }
         ListClient baru = new ListClient();
