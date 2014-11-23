@@ -1,7 +1,6 @@
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -35,6 +33,7 @@ public class client extends javax.swing.JFrame {
     ObjectInputStream ois  = null;
     DataInputStream dis  = null;
     BufferedReader br  = null;
+     File f;
     ArrayList<String> rcpt = new ArrayList<>();
     /**
      * Creates new form client
@@ -131,6 +130,11 @@ public class client extends javax.swing.JFrame {
         jLabel3.setText("Path of file :");
 
         sendFile.setText("SEND");
+        sendFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendFileActionPerformed(evt);
+            }
+        });
 
         disConn.setText("Disconnect");
         disConn.setEnabled(false);
@@ -245,7 +249,7 @@ public class client extends javax.swing.JFrame {
     private void attachBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attachBtnActionPerformed
         JFileChooser jc = new JFileChooser();
         jc.showOpenDialog(null);
-        File f = jc.getSelectedFile();
+        f = jc.getSelectedFile();
         pathFile.setText(f.getAbsolutePath());
     }//GEN-LAST:event_attachBtnActionPerformed
 
@@ -268,12 +272,6 @@ public class client extends javax.swing.JFrame {
             String msg;
             msg = ois.readUTF();
             System.out.println(msg);
-            
-            /*bos.write("HALOOOO".getBytes());
-            bos.flush();*/
-            
-            
-          
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -314,6 +312,25 @@ public class client extends javax.swing.JFrame {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }       
     }//GEN-LAST:event_rfshBtnActionPerformed
+
+    private void sendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendFileActionPerformed
+         try {
+            oos.writeUTF("RCPT");
+            oos.flush();
+            
+            String msg = ois.readUTF();
+            if (msg.equals("OK")){
+                ListClient Baru = new ListClient();
+                Baru.setNames(rcpt);
+                Baru.setContentFile(f);
+                oos.writeObject(Baru);
+                oos.flush();
+                oos.reset();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_sendFileActionPerformed
 
     /**
      * @param args the command line arguments
