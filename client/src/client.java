@@ -35,6 +35,7 @@ public class client extends javax.swing.JFrame {
     ObjectInputStream ois  = null;
     DataInputStream dis  = null;
     BufferedReader br  = null;
+    ArrayList<String> rcpt = new ArrayList<>();
     /**
      * Creates new form client
      */
@@ -92,8 +93,6 @@ public class client extends javax.swing.JFrame {
 
         label1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         label1.setText("SIMPLE FILE SHARING");
-
-        rcptList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         addBtn.setText("add");
         addBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -234,10 +233,13 @@ public class client extends javax.swing.JFrame {
     
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
         sRcptList.append(rcptList.getSelectedItem().toString() + "\n");
+        rcpt.add(rcptList.getSelectedItem().toString());
+        
     }//GEN-LAST:event_addBtnActionPerformed
 
     private void clrBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clrBtnActionPerformed
         sRcptList.setText(null);
+        rcpt.clear();
     }//GEN-LAST:event_clrBtnActionPerformed
 
     private void attachBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_attachBtnActionPerformed
