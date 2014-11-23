@@ -94,7 +94,8 @@ public class threadClient implements Runnable{
         threadClient tc = null;
         for(int i=0; i<this.alThread.size(); i++){
             tc  = this.alThread.get(i);
-            names.add(tc.getUsername());
+            if(tc.getUsername()!=this.getUsername())
+                names.add(tc.getUsername());
         }
         ListClient baru = new ListClient();
         baru.setNames(names);
