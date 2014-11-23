@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -34,7 +35,6 @@ public class client extends javax.swing.JFrame {
     ObjectInputStream ois  = null;
     DataInputStream dis  = null;
     BufferedReader br  = null;
-    BufferedWriter bw  = null;
     /**
      * Creates new form client
      */
@@ -256,12 +256,21 @@ public class client extends javax.swing.JFrame {
             ois = new ObjectInputStream(server.getInputStream());
             dis = new DataInputStream(server.getInputStream());
             br = new BufferedReader(new InputStreamReader(dis));
-            bw = new BufferedWriter(new OutputStreamWriter(oos));
             conn.setEnabled(false);
+            uname.setEnabled(false);
             disConn.setEnabled(true);
-            bos.write(uname.getText().getBytes());
-            bos.flush();
             this.setEnabling(true);
+            oos.writeUTF(uname.getText());
+            oos.flush();
+            
+            String msg;
+            msg = ois.readUTF();
+            System.out.println(msg);
+            
+            /*bos.write("HALOOOO".getBytes());
+            bos.flush();*/
+            
+            
           
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
@@ -274,8 +283,12 @@ public class client extends javax.swing.JFrame {
 
     private void disConnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disConnActionPerformed
         try {
-            bos.write("QUIT".getBytes());
-            bos.flush();
+            oos.writeUTF("QUIT");
+            oos.flush();
+            server.close();
+            this.setEnabling(false);
+            conn.setEnabled(true);
+            uname.setEnabled(true);
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -284,11 +297,20 @@ public class client extends javax.swing.JFrame {
 
     private void rfshBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rfshBtnActionPerformed
         try {
-            bos.write("LIST".getBytes());
-            bos.flush();
+            oos.writeUTF("LIST");
+            oos.flush();
+            ListClient Baru = new ListClient();
+            Baru = (ListClient) ois.readObject();
+            ArrayList<String> names = Baru.getNames();
+            rcptList.removeAllItems();
+            for (int i = 0; i < names.size();i++){
+                rcptList.addItem(names.get(i));
+            }
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }       
     }//GEN-LAST:event_rfshBtnActionPerformed
 
     /**
