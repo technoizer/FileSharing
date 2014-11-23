@@ -1,7 +1,6 @@
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -9,12 +8,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -232,9 +231,12 @@ public class client extends javax.swing.JFrame {
     }
     
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
-        sRcptList.append(rcptList.getSelectedItem().toString() + "\n");
-        rcpt.add(rcptList.getSelectedItem().toString());
-        
+        if(sRcptList.getSelectedText() == null) 
+            JOptionPane.showMessageDialog(null,"Anda belum menentukan tujuan receipent","OH TIDAK",JOptionPane.ERROR_MESSAGE);       
+        else {
+            sRcptList.append(rcptList.getSelectedItem().toString() + "\n");
+            rcpt.add(rcptList.getSelectedItem().toString());            
+        }
     }//GEN-LAST:event_addBtnActionPerformed
 
     private void clrBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clrBtnActionPerformed
@@ -251,28 +253,28 @@ public class client extends javax.swing.JFrame {
 
     private void connActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connActionPerformed
         try {
-            server = new Socket("localhost",6060);
-            dos = new DataOutputStream(server.getOutputStream());
-            bos = new BufferedOutputStream(server.getOutputStream());
-            oos = new ObjectOutputStream(server.getOutputStream());
-            ois = new ObjectInputStream(server.getInputStream());
-            dis = new DataInputStream(server.getInputStream());
-            br = new BufferedReader(new InputStreamReader(dis));
-            conn.setEnabled(false);
-            uname.setEnabled(false);
-            disConn.setEnabled(true);
-            this.setEnabling(true);
-            oos.writeUTF(uname.getText());
-            oos.flush();
-            
-            String msg;
-            msg = ois.readUTF();
-            System.out.println(msg);
-            
-            /*bos.write("HALOOOO".getBytes());
-            bos.flush();*/
-            
-            
+            if("".equals(uname.getText()))
+                JOptionPane.showMessageDialog(null,"Anda belum memasukkan username valid","OH TIDAK",JOptionPane.ERROR_MESSAGE);       
+            else{
+                server = new Socket("localhost",6060);
+                dos = new DataOutputStream(server.getOutputStream());
+                bos = new BufferedOutputStream(server.getOutputStream());
+                oos = new ObjectOutputStream(server.getOutputStream());
+                ois = new ObjectInputStream(server.getInputStream());
+                dis = new DataInputStream(server.getInputStream());
+                br = new BufferedReader(new InputStreamReader(dis));
+                conn.setEnabled(false);
+                uname.setEnabled(false);
+                disConn.setEnabled(true);
+                this.setEnabling(true);
+                oos.writeUTF(uname.getText());
+                oos.flush();
+
+                String msg;
+                msg = ois.readUTF();
+                System.out.println(msg);        
+
+            }               
           
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
