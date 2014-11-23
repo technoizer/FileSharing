@@ -50,13 +50,25 @@ public class threadClient implements Runnable{
             ois = new ObjectInputStream(this.getSockcli().getInputStream());
             dis = new DataInputStream(this.getSockcli().getInputStream());
             br = new BufferedReader(new InputStreamReader(dis));
-            bw = new BufferedWriter(new OutputStreamWriter(oos));
             
             String msg;
-            while ((msg = br.readLine())!= null){
-                
+            oos.writeUTF("HALO");
+            oos.flush();
+            
+            msg = ois.readUTF();
+            System.out.print(msg + "\n");
+            this.setUsername(msg);
+            
+            while ((msg = ois.readUTF()) != null ){
+                if (msg.equals("LIST") == true){
+                    this.sendList();
+                }
+                else if (msg.equals("QUIT")){
+                    break;
+                }
+                System.out.print(msg + "\n");
             }
-            bos.close();
+            oos.close();
             getSockcli().close();
             synchronized(this.alThread){
                 this.alThread.remove(this);
@@ -77,7 +89,18 @@ public class threadClient implements Runnable{
             tc.send(msg);
         }
     }
-
+    public synchronized void sendList() throws IOException{
+        ArrayList<String> names = new ArrayList<String>();
+        threadClient tc = null;
+        for(int i=0; i<this.alThread.size(); i++){
+            tc  = this.alThread.get(i);
+            names.add(tc.getUsername());
+        }
+        ListClient baru = new ListClient();
+        baru.setNames(names);
+        oos.writeObject(baru);
+        oos.flush();
+    }
     /**
      * @return the sockcli
      */
