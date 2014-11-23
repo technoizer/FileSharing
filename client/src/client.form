@@ -33,7 +33,7 @@
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="textField1" min="-2" pref="99" max="-2" attributes="0"/>
+                                  <Component id="uname" min="-2" pref="99" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="conn" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -87,7 +87,7 @@
               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="conn" pref="0" max="32767" attributes="0"/>
-                  <Component id="textField1" max="32767" attributes="0"/>
+                  <Component id="uname" max="32767" attributes="0"/>
               </Group>
               <EmptySpace pref="14" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -123,6 +123,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Connect"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="connActionPerformed"/>
+      </Events>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <AuxValues>
@@ -145,7 +148,10 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="java.awt.TextField" name="textField1">
+    <Component class="java.awt.TextField" name="uname">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="unameActionPerformed"/>
+      </Events>
     </Component>
     <Component class="java.awt.Label" name="label1">
       <Properties>
@@ -179,6 +185,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="refresh"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rfshBtnActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="clrBtn">
       <Properties>
@@ -226,6 +235,9 @@
         <Property name="text" type="java.lang.String" value="Disconnect"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="disConnActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

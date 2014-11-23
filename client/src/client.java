@@ -1,5 +1,18 @@
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
 /*
@@ -14,11 +27,20 @@ import javax.swing.JFileChooser;
  */
 public class client extends javax.swing.JFrame {
 
+    Socket server = null;
+    DataOutputStream dos = null;
+    BufferedOutputStream bos = null;
+    ObjectOutputStream oos  = null;
+    ObjectInputStream ois  = null;
+    DataInputStream dis  = null;
+    BufferedReader br  = null;
+    BufferedWriter bw  = null;
     /**
      * Creates new form client
      */
-    public client() {
+    public client() { 
         initComponents();
+        this.setEnabling(false);
     }
 
     /**
@@ -33,7 +55,7 @@ public class client extends javax.swing.JFrame {
         conn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         sRcptList = new javax.swing.JTextArea();
-        textField1 = new java.awt.TextField();
+        uname = new java.awt.TextField();
         label1 = new java.awt.Label();
         rcptList = new javax.swing.JComboBox();
         addBtn = new javax.swing.JButton();
@@ -50,12 +72,23 @@ public class client extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         conn.setText("Connect");
+        conn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                connActionPerformed(evt);
+            }
+        });
 
         sRcptList.setEditable(false);
         sRcptList.setColumns(12);
         sRcptList.setRows(5);
         sRcptList.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jScrollPane1.setViewportView(sRcptList);
+
+        uname.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                unameActionPerformed(evt);
+            }
+        });
 
         label1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         label1.setText("SIMPLE FILE SHARING");
@@ -70,6 +103,11 @@ public class client extends javax.swing.JFrame {
         });
 
         rfshBtn.setText("refresh");
+        rfshBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rfshBtnActionPerformed(evt);
+            }
+        });
 
         clrBtn.setText("clear");
         clrBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -97,6 +135,11 @@ public class client extends javax.swing.JFrame {
 
         disConn.setText("Disconnect");
         disConn.setEnabled(false);
+        disConn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                disConnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -112,7 +155,7 @@ public class client extends javax.swing.JFrame {
                                 .addComponent(jLabel2)
                                 .addComponent(jLabel1)
                                 .addGroup(layout.createSequentialGroup()
-                                    .addComponent(textField1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(uname, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(conn))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
@@ -151,7 +194,7 @@ public class client extends javax.swing.JFrame {
                 .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(conn, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(textField1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(uname, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
@@ -177,7 +220,18 @@ public class client extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    private void setEnabling(boolean param)
+    {
+        rcptList.setEnabled(param);
+        sRcptList.setEnabled(param); 
+        pathFile.setEnabled(param);
+        rfshBtn.setEnabled(param);
+        addBtn.setEnabled(param);
+        sendFile.setEnabled(param);
+        attachBtn.setEnabled(param);
+        
+    }
+    
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
         sRcptList.append(rcptList.getSelectedItem().toString() + "\n");
     }//GEN-LAST:event_addBtnActionPerformed
@@ -192,6 +246,50 @@ public class client extends javax.swing.JFrame {
         File f = jc.getSelectedFile();
         pathFile.setText(f.getAbsolutePath());
     }//GEN-LAST:event_attachBtnActionPerformed
+
+    private void connActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connActionPerformed
+        try {
+            server = new Socket("localhost",6060);
+            dos = new DataOutputStream(server.getOutputStream());
+            bos = new BufferedOutputStream(server.getOutputStream());
+            oos = new ObjectOutputStream(server.getOutputStream());
+            ois = new ObjectInputStream(server.getInputStream());
+            dis = new DataInputStream(server.getInputStream());
+            br = new BufferedReader(new InputStreamReader(dis));
+            bw = new BufferedWriter(new OutputStreamWriter(oos));
+            conn.setEnabled(false);
+            disConn.setEnabled(true);
+            bos.write(uname.getText().getBytes());
+            bos.flush();
+            this.setEnabling(true);
+          
+        } catch (IOException ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_connActionPerformed
+
+    private void unameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_unameActionPerformed
+
+    private void disConnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disConnActionPerformed
+        try {
+            bos.write("QUIT".getBytes());
+            bos.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_disConnActionPerformed
+
+    private void rfshBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rfshBtnActionPerformed
+        try {
+            bos.write("LIST".getBytes());
+            bos.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }//GEN-LAST:event_rfshBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -244,6 +342,6 @@ public class client extends javax.swing.JFrame {
     private javax.swing.JButton rfshBtn;
     private javax.swing.JTextArea sRcptList;
     private javax.swing.JButton sendFile;
-    private java.awt.TextField textField1;
+    private java.awt.TextField uname;
     // End of variables declaration//GEN-END:variables
 }
