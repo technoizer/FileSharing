@@ -1,3 +1,10 @@
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -13,6 +20,9 @@ public class server extends javax.swing.JFrame {
     /**
      * Creates new form server
      */
+    ServerSocket server = null;
+    Socket client = null;
+    
     public server() {
         initComponents();
     }
@@ -26,21 +36,56 @@ public class server extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        turnOn = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        turnOn.setText("Turn On");
+        turnOn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                turnOnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(319, Short.MAX_VALUE)
+                .addComponent(turnOn)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(266, Short.MAX_VALUE)
+                .addComponent(turnOn)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void turnOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_turnOnActionPerformed
+        try {
+            ArrayList<threadClient> alThread = new ArrayList<>();
+            server = new ServerSocket(6060);            
+            while (true){
+                client = server.accept();
+                synchronized(alThread)
+                {
+                    //JOptionPane.showMessageDialog(null,Baru.getUsername() + " " + Baru.getPassword());
+                    threadClient tc = new threadClient(client,alThread);
+                    alThread.add(tc);
+                    Thread t = new Thread(tc);
+                    t.start();
+                }
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null,"No Client Available");
+        }
+    }//GEN-LAST:event_turnOnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -78,5 +123,6 @@ public class server extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton turnOn;
     // End of variables declaration//GEN-END:variables
 }
